@@ -7,15 +7,10 @@ import (
 
 	"echo-book/config"
 )
- 
 
- 
-
- 
 func main() {
-  config.InitDB()
-  e := route.New()
-  // start the server, and log if it fails
-  e.Logger.Fatal(e.Start(":8000"))
+	config.InitDB()
+	e := route.New()
+	// start the server, and log if it fails
+	e.Logger.Fatal(e.Start(":1323"))
 }
-
