@@ -1,100 +1,97 @@
 package controller
 
 import (
-	"net/http"
-	"strconv"
-
-	"echo-book/config"
 	"echo-book/model"
+	"echo-book/services"
+	"net/http"
 
 	"github.com/labstack/echo"
 )
 
 // get all Books
 func GetBooksController(c echo.Context) error {
-	var books []model.Book
+	books, err := services.GetAllBooks()
 
-	if err := config.DB.Find(&books).Error; err != nil {
+	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
-	return c.JSON(http.StatusOK, map[string]interface{}{
+	return c.JSON(http.StatusOK, map[string]any{
 		"message": "success get all book",
-		"users":   books,
+		"Books":   books,
 	})
 }
 
 // get book by id
 func GetBookController(c echo.Context) error {
 	// your solution here
-	var book model.Book
 
-	id, _ := strconv.Atoi(c.Param("id"))
+	var bookId string = c.Param("id")
 
-	config.DB.First(&book, "id = ?", id)
+	book, err := services.GetBookByID(bookId)
 
-	if book.ID == 0 {
-		return c.JSON(http.StatusNotFound, map[string]interface{}{
+	if err != nil {
+		return c.JSON(http.StatusNotFound, map[string]any{
 			"messages": "Book not Found",
 		})
 	}
 
-	return c.JSON(http.StatusOK, map[string]interface{}{
-		"message": "success get book",
+	return c.JSON(http.StatusOK, map[string]any{
+		"message": "success get Book",
 		"user":    book,
 	})
 }
 
-// create new user
+// create new Book
 func CreateBookController(c echo.Context) error {
-	book := model.Book{}
-	c.Bind(&book)
+	bookInput := model.Book{}
+	c.Bind(&bookInput)
 
-	if err := config.DB.Save(&book).Error; err != nil {
+	book, err := services.CreateBook(bookInput)
+
+	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
-	return c.JSON(http.StatusOK, map[string]interface{}{
+	return c.JSON(http.StatusOK, map[string]any{
 		"message": "success create new book",
 		"user":    book,
 	})
 }
 
-// delete user by id
+// delete Book by id
 func DeleteBookController(c echo.Context) error {
 	// your solution here
-	var book model.Book
-	c.Bind(&book)
+	var bookId string = c.Param("id")
 
-	id, _ := strconv.Atoi(c.Param("id"))
-	config.DB.First(&book, "id = ?", id)
-	config.DB.Delete(&book)
+	isDeleted := services.DeleteUser(bookId)
 
-	return c.JSON(http.StatusOK, map[string]interface{}{
+	if !isDeleted {
+		return c.JSON(http.StatusNotFound, map[string]any{
+			"message": "book not found",
+		})
+
+	}
+
+	return c.JSON(http.StatusOK, map[string]any{
 		"message": "success delete book",
 	})
 }
 
-// update user by id
+// update Book by id
 func UpdateBookController(c echo.Context) error {
 	// your solution here
-	book := model.Book{}
-	id, _ := strconv.Atoi(c.Param("id"))
-	config.DB.First(&book, id)
+	var bookId string = c.Param("id")
 
-	if book.ID == 0 {
-		return c.JSON(http.StatusOK, map[string]interface{}{
-			"messages": "invalid id",
-		})
+	var bookInput model.Book = model.Book{}
+	c.Bind(&bookInput)
+
+	book, err := services.UpdateBook(bookInput, bookId)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
-	config.DB.Model(&book).Where("id= ?", id).Update(book.JudulBuku, book.Kategori, book.Pengarang, book.Penerbit, book.Isbn)
-
-	c.Bind(&book)
-
-	config.DB.Save(&book)
-
-	return c.JSON(http.StatusOK, map[string]interface{}{
+	return c.JSON(http.StatusOK, map[string]any{
 		"message": "success update book",
-		"book":    book,
+		"user":    book,
 	})
 
 }

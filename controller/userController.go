@@ -2,22 +2,23 @@ package controller
 
 import (
 	"net/http"
-	"strconv"
 
-	"echo-book/config"
 	"echo-book/model"
+
+	"echo-book/services"
 
 	"github.com/labstack/echo"
 )
 
 // get all users
 func GetUsersController(c echo.Context) error {
-	var users []model.User
+	users, err := services.GetAllusers()
 
-	if err := config.DB.Find(&users).Error; err != nil {
+	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
-	return c.JSON(http.StatusOK, map[string]interface{}{
+
+	return c.JSON(http.StatusOK, map[string]any{
 		"message": "success get all users",
 		"users":   users,
 	})
@@ -26,19 +27,17 @@ func GetUsersController(c echo.Context) error {
 // get user by id
 func GetUserController(c echo.Context) error {
 	// your solution here
-	var user model.User
+	var userId string = c.Param("id")
 
-	id, _ := strconv.Atoi(c.Param("id"))
+	user, err := services.GetUserByID(userId)
 
-	config.DB.First(&user, "id = ?", id)
-
-	if user.ID == 0 {
-		return c.JSON(http.StatusNotFound, map[string]interface{}{
+	if err != nil {
+		return c.JSON(http.StatusNotFound, map[string]any{
 			"messages": "User not Found",
 		})
 	}
 
-	return c.JSON(http.StatusOK, map[string]interface{}{
+	return c.JSON(http.StatusOK, map[string]any{
 		"message": "success get user",
 		"user":    user,
 	})
@@ -46,13 +45,15 @@ func GetUserController(c echo.Context) error {
 
 // create new user
 func CreateUserController(c echo.Context) error {
-	user := model.User{}
-	c.Bind(&user)
+	userInput := model.User{}
+	c.Bind(&userInput)
 
-	if err := config.DB.Save(&user).Error; err != nil {
+	user, err := services.CreateUser(userInput)
+
+	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
-	return c.JSON(http.StatusOK, map[string]interface{}{
+	return c.JSON(http.StatusOK, map[string]any{
 		"message": "success create new user",
 		"user":    user,
 	})
@@ -61,14 +62,19 @@ func CreateUserController(c echo.Context) error {
 // delete user by id
 func DeleteUserController(c echo.Context) error {
 	// your solution here
-	var user model.User
-	c.Bind(&user)
 
-	id, _ := strconv.Atoi(c.Param("id"))
-	config.DB.First(&user, "id = ?", id)
-	config.DB.Delete(&user)
+	var userId string = c.Param("id")
 
-	return c.JSON(http.StatusOK, map[string]interface{}{
+	isDeleted := services.DeleteUser(userId)
+
+	if !isDeleted {
+		return c.JSON(http.StatusNotFound, map[string]any{
+			"message": "user not found",
+		})
+
+	}
+
+	return c.JSON(http.StatusOK, map[string]any{
 		"message": "success delete user",
 	})
 }
@@ -77,20 +83,15 @@ func DeleteUserController(c echo.Context) error {
 func UpdateUserController(c echo.Context) error {
 	// your solution here
 
-	user := model.User{}
+	var userId string = c.Param("id")
 
-	id, _ := strconv.Atoi(c.Param("id"))
-	config.DB.First(&user, id)
+	var userInput model.User = model.User{}
+	c.Bind(&userInput)
 
-	if user.ID == 0 {
-		return c.JSON(http.StatusOK, map[string]interface{}{
-			"messages": "invalid id",
-		})
+	user, err := services.UpdateUser(userInput, userId)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
-	config.DB.Model(&user).Where("id= ?", id).Update(user.Name, user.Email, user.Password)
-	c.Bind(&user)
-
-	config.DB.Save(&user)
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
 		"message": "success update user",
