@@ -11,11 +11,12 @@ import (
 type AuthRepositoryImpl struct {
 }
 
-func (a *AuthRepositoryImpl) Register(input model.UserInput) model.User {
+func (a *AuthRepositoryImpl) Register(input model.UserRegister) model.User {
 
 	password, _ := bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.DefaultCost)
 
 	var newUser model.User = model.User{
+		Name:     input.Name,
 		Email:    input.Email,
 		Password: string(password),
 	}

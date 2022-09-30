@@ -11,7 +11,7 @@ import (
 var authService services.AuthService = services.NewAuthService()
 
 func Register(c echo.Context) error {
-	var userInput *model.UserInput = new(model.UserInput)
+	var userInput *model.UserRegister = new(model.UserRegister)
 
 	if err := c.Bind(userInput); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{

@@ -33,7 +33,7 @@ func GetUserByID(id string) (model.User, error) {
 
 func CreateUser(input model.User) (model.User, error) {
 	var user model.User = model.User{
-		// Name:     input.Name,
+		Name:     input.Name,
 		Email:    input.Email,
 		Password: input.Password,
 	}
@@ -54,7 +54,7 @@ func UpdateUser(input model.User, id string) (model.User, error) {
 	}
 
 	user.Email = input.Email
-	// user.Name = input.Name
+	user.Name = input.Name
 	user.Password = input.Password
 
 	if err := database.DB.Save(&user).Error; err != nil {

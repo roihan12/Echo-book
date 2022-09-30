@@ -15,7 +15,7 @@ func NewAuthService() AuthService {
 	}
 }
 
-func (a *AuthService) Register(input model.UserInput) model.User {
+func (a *AuthService) Register(input model.UserRegister) model.User {
 	return a.Repository.Register(input)
 }
 
