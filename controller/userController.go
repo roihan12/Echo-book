@@ -7,7 +7,7 @@ import (
 
 	"echo-book/services"
 
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 )
 
 // get all users

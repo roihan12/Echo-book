@@ -3,24 +3,37 @@ package route
 import (
 	"echo-book/controller"
 
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 )
 
-func New() *echo.Echo {
-	e := echo.New()
+func SetupRoute(server *echo.Echo) {
+
+	// route for auth
+
+	server.POST("/users/register", controller.Register)
+	server.POST("/users/login", controller.Login)
+
+	privateRoutes := server.Group("")
+
+	privateRoutes.Use(middleware.JWTWithConfig(middleware.JWTConfig{
+		SigningKey: []byte("secretkey"),
+	}))
+
 	// Route / to handler function
-	e.GET("/users", controller.GetUsersController)
-	e.GET("/users/:id", controller.GetUserController)
-	e.POST("/users", controller.CreateUserController)
-	e.DELETE("/users/:id", controller.DeleteUserController)
-	e.PUT("/users/:id", controller.UpdateUserController)
+	//Route Users
+	server.POST("/users", controller.CreateUserController)
+	server.GET("/books", controller.GetBooksController)
+	server.GET("/books/:id", controller.GetBookController)
 
-	e.GET("/books", controller.GetBooksController)
-	e.GET("/books/:id", controller.GetBookController)
-	e.POST("/books", controller.CreateBookController)
-	e.DELETE("/books/:id", controller.DeleteBookController)
-	e.PUT("/books/:id", controller.UpdateBookController)
+	privateRoutes.GET("/users", controller.GetUsersController)
+	privateRoutes.GET("/users/:id", controller.GetUserController)
+	privateRoutes.DELETE("/users/:id", controller.DeleteUserController)
+	privateRoutes.PUT("/users/:id", controller.UpdateUserController)
 
-	return e
+	//Route Books
+	privateRoutes.POST("/books", controller.CreateBookController)
+	privateRoutes.DELETE("/books/:id", controller.DeleteBookController)
+	privateRoutes.PUT("/books/:id", controller.UpdateBookController)
 
 }

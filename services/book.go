@@ -1,7 +1,7 @@
 package services
 
 import (
-	"echo-book/config"
+	"echo-book/database"
 	"echo-book/model"
 	"errors"
 )
@@ -10,7 +10,7 @@ func GetAllBooks() ([]model.Book, error) {
 
 	var books []model.Book
 
-	if err := config.DB.Find(&books).Error; err != nil {
+	if err := database.DB.Find(&books).Error; err != nil {
 		return []model.Book{}, err
 	}
 
@@ -20,7 +20,7 @@ func GetAllBooks() ([]model.Book, error) {
 func GetBookByID(id string) (model.Book, error) {
 	var book model.Book = model.Book{}
 
-	if err := config.DB.Find(&book, "id = ?", id).Error; err != nil {
+	if err := database.DB.Find(&book, "id = ?", id).Error; err != nil {
 		return model.Book{}, err
 	}
 
@@ -41,7 +41,7 @@ func CreateBook(input model.Book) (model.Book, error) {
 		Isbn:        input.Isbn,
 	}
 
-	if err := config.DB.Save(&book).Error; err != nil {
+	if err := database.DB.Save(&book).Error; err != nil {
 		return model.Book{}, err
 	}
 
@@ -63,7 +63,7 @@ func UpdateBook(input model.Book, id string) (model.Book, error) {
 	book.TahunTerbit = input.TahunTerbit
 	book.Isbn = input.Isbn
 
-	if err := config.DB.Save(&book).Error; err != nil {
+	if err := database.DB.Save(&book).Error; err != nil {
 		return model.Book{}, nil
 	}
 
@@ -77,7 +77,7 @@ func DeleteBook(id string) bool {
 		return false
 	}
 
-	if err := config.DB.Delete(&book).Error; err != nil {
+	if err := database.DB.Delete(&book).Error; err != nil {
 		return false
 	}
 

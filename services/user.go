@@ -1,7 +1,7 @@
 package services
 
 import (
-	"echo-book/config"
+	"echo-book/database"
 	"echo-book/model"
 	"errors"
 )
@@ -10,7 +10,7 @@ func GetAllusers() ([]model.User, error) {
 
 	var users []model.User
 
-	if err := config.DB.Find(&users).Error; err != nil {
+	if err := database.DB.Find(&users).Error; err != nil {
 		return []model.User{}, err
 	}
 
@@ -20,7 +20,7 @@ func GetAllusers() ([]model.User, error) {
 func GetUserByID(id string) (model.User, error) {
 	var user model.User = model.User{}
 
-	if err := config.DB.Find(&user, "id = ?", id).Error; err != nil {
+	if err := database.DB.Find(&user, "id = ?", id).Error; err != nil {
 		return model.User{}, err
 	}
 
@@ -33,12 +33,12 @@ func GetUserByID(id string) (model.User, error) {
 
 func CreateUser(input model.User) (model.User, error) {
 	var user model.User = model.User{
-		Name:     input.Name,
+		// Name:     input.Name,
 		Email:    input.Email,
 		Password: input.Password,
 	}
 
-	if err := config.DB.Save(&user).Error; err != nil {
+	if err := database.DB.Save(&user).Error; err != nil {
 		return model.User{}, err
 	}
 
@@ -54,10 +54,10 @@ func UpdateUser(input model.User, id string) (model.User, error) {
 	}
 
 	user.Email = input.Email
-	user.Name = input.Name
+	// user.Name = input.Name
 	user.Password = input.Password
 
-	if err := config.DB.Save(&user).Error; err != nil {
+	if err := database.DB.Save(&user).Error; err != nil {
 		return model.User{}, nil
 	}
 
@@ -71,7 +71,7 @@ func DeleteUser(id string) bool {
 		return false
 	}
 
-	if err := config.DB.Delete(&user).Error; err != nil {
+	if err := database.DB.Delete(&user).Error; err != nil {
 		return false
 	}
 

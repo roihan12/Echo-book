@@ -1,16 +1,21 @@
 package main
 
 import (
-	_ "github.com/jinzhu/gorm/dialects/mysql"
-
+	"echo-book/middlewares"
 	"echo-book/route"
 
-	"echo-book/config"
+	"echo-book/database"
+
+	"github.com/labstack/echo/v4"
 )
 
 func main() {
-	config.InitDB()
-	e := route.New()
+	database.Connect()
+	server := echo.New()
+
+	middlewares.LogMiddleware(server)
+
+	route.SetupRoute(server)
 	// start the server, and log if it fails
-	e.Logger.Fatal(e.Start(":1323"))
+	server.Logger.Fatal(server.Start(":1323"))
 }
