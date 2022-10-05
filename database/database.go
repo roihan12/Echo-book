@@ -2,7 +2,6 @@ package database
 
 import (
 	"echo-book/model"
-	"echo-book/util"
 	"fmt"
 	"log"
 
@@ -14,12 +13,11 @@ import (
 var DB *gorm.DB
 
 var (
-	DB_USERNAME  string = util.GetConfig("DB_USERNAME")
-	DB_PASSWORD  string = util.GetConfig("DB_PASSWORD")
-	DB_NAME      string = util.GetConfig("DB_NAME")
-	DB_HOST      string = util.GetConfig("DB_HOST")
-	DB_PORT      string = util.GetConfig("DB_PORT")
-	DB_TEST_NAME string = util.GetConfig("DB_TEST_NAME")
+	DB_USERNAME string = "root"      //util.GetConfig("DB_USERNAME")
+	DB_PASSWORD string = "root123"   //util.GetConfig("DB_PASSWORD")
+	DB_NAME     string = "echo_book" //util.GetConfig("DB_NAME")
+	DB_HOST     string = "localhost" //util.GetConfig("DB_HOST")
+	DB_PORT     string = "3306"      //util.GetConfig("DB_PORT")
 )
 
 func Connect() {
@@ -107,6 +105,7 @@ func SeedUser() model.User {
 	password, _ := bcrypt.GenerateFromPassword([]byte("123123"), bcrypt.DefaultCost)
 
 	var user model.User = model.User{
+		Name:     "Testing",
 		Email:    "testing@mail.com",
 		Password: string(password),
 	}

@@ -10,8 +10,10 @@ import (
 )
 
 func main() {
-	database.Connect()
+	// database.Connect()
 	server := echo.New()
+
+	database.InitTestDB()
 
 	middlewares.LogMiddleware(server)
 
